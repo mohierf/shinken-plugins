@@ -19,20 +19,20 @@ STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
 
-services="addok addok-wrapper amavis apache2 atd bind9 ceph couchdb cron dibbler-client dovecot exim4 fail2ban fcgiwrap glassfish gitlab lm-sensors mailgraph memcached mongodb nagios-nrpe-server nginx npcd ntp openvpn pgbouncer php5-fpm postfix pure-ftpd-mysql rabbitmq-server redis-server resolvconf rsyslog shinken shorewall shorewall6 slapd spamassassin ssh uwsgi"
+services="addok addok-wrapper apache2 atd bind9 ceph clamav-daemon couchdb cron dibbler-client docker dovecot elasticsearch exim4 fail2ban fcgiwrap lm-sensors logstash lsyncd mailgraph memcached mongodb mongod nagios-nrpe-server nginx npcd ntp openvpn pdns pgbouncer php5-fpm php7.0-fpm php7.1-fpm php7.2-fpm postfix pure-ftpd-mysql rabbitmq-server redis-server repmgrd resolvconf rspamd rsyslog shorewall shorewall6 slapd ssh uwsgi unbound"
 
 down=""
 
 for service in $services ; do
     if [ -f /etc/init.d/$service -o -f /lib/systemd/system/${service}.service ] ; then
-        /usr/sbin/service $service status > /dev/null || down="$down $service"
+        service $service status > /dev/null || down="$down $service"
     fi
 done
 
 # Postgres special case : 4 means that postgresql-common is installed but not
 # postgresql-server, so it's OK if postgres is not running
 if [ -f /etc/init.d/postgresql ] ; then
-    /usr/sbin/service postgresql status > /dev/null
+    service postgresql status > /dev/null
     s=$?
     [ $s -ne 0 -a $s -ne 4 ] && down="$down postgresql"
 fi
